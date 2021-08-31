@@ -1,13 +1,13 @@
 import os
-
+import argparse
 
 
 class Parser:
-    def __init__(self, root_dir, output_dir, save_txt=False, points_name=None):
+
+    def __init__(self, root_dir, output_dir, points_name=None):
         self.root_dir = root_dir
         self.output_dir = output_dir
         self.points_name = points_name
-        self.save_txt = save_txt
 
     def parse(self):
         directories = os.listdir(self.root_dir)
@@ -56,16 +56,12 @@ class Parser:
 
         path = os.path.join(folder, filename)
 
-        txt = path[:-3] + 'txt'
-        txtFile = open(txt, 'wb')
-
-        with open(path, 'wb') as f:
+        with open(path, 'w') as f:
             if self.points_name is None:
                 self._write_header(f, len(points.items()))
 
                 for k, v in points.items():
                     f.write('{}\n'.format(v))
-                    txtFile.write('{} - {}\n'.format(k, v))
 
             else:
                 self._write_header(f, len(self.points_name))
@@ -73,11 +69,6 @@ class Parser:
                 for k, v in points.items():
                     if k in self.points_name:
                         f.write('{}\n'.format(v))
-
-                        if self.save_txt:
-                            txtFile.write('{} - {}\n'.format(k, v))
-
-        txtFile.close()
 
     def _write_header(self, f, n):
         f.write('# .PCD v0.7 - Point Cloud Data file format\n')
@@ -94,9 +85,11 @@ class Parser:
 
 
 if __name__ == '__main__':
-    root_dir = '/media/thalisson/Seagate Expansion Drive/BD Faces/Bosphorus'
-    output_dir = './landmarks'
-    points_name = ['Inner left eye corner']
+    parser = argparse.ArgumentParser()
+    parser.add_argument('root_dir', help='Path where the database and .lm3 files are located.')
+    parser.add_argument('output_dir', help='Output directory where the clouds will be created.')
+    parser.add_argument('points', nargs='*', help='The landmarks you are looking for.')
 
-    parser = Parser(root_dir, output_dir, points_name=points_name)
+    args = parser.parse_args()
+    parser = Parser(args.root_dir, args.output_dir, args.points)
     parser.parse()
