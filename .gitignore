@@ -4,4 +4,6 @@
 *.lm3
 .ipynb_checkpoints/
 __pycache__/
-
+data/
+landmarks/
+experiments/
